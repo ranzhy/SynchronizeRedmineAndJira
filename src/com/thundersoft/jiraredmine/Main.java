@@ -1,8 +1,8 @@
 package com.thundersoft.jiraredmine;
 
-import java.io.IOException;
-
-import org.xml.sax.SAXException;
+import java.net.URL;
+import java.net.URLStreamHandler;
+import java.net.URLStreamHandlerFactory;
 
 import com.taskadapter.redmineapi.RedmineException;
 import com.taskadapter.redmineapi.RedmineManager;
@@ -22,14 +22,33 @@ public class Main {
     public static void main(String[] args) throws RedmineException {
         System.setProperty ("jsse.enableSNIExtension", "false");
 
+//        URL.setURLStreamHandlerFactory(new URLStreamHandlerFactory() {
+//
+//            @Override
+//            public URLStreamHandler createURLStreamHandler(String protocol) {
+//                if ("file".equals(protocol)) {
+//                    return new sun.net.www.protocol.file.Handler();
+//                }
+//                return null;
+//            }
+//            
+//        });
+        Log.info(Main.class, "================= Issue Syncronize =====================");
+
         SystemConfig system = SystemConfig.getInstance();
         ServerConfig config = system.getServerConfig();
 
         RedmineManager redmine = RedmineManagerFactory.createWithUserAuth(
                 config.getRedmineUrl(), config.getRedmineLoginUser(), config.getRedmineLoginPasswd());
+
+        Log.info(Main.class, "Will create Issue handler for " + redmine);
         AbstractIssueHandler issueHandler = system.createIssueHandler(redmine);
+        Log.info(Main.class, "Created Issue handler: " + issueHandler);
+
         RedmineSynchronizer synchronizer = new RedmineSynchronizer(redmine.getIssueManager(), issueHandler);
         LocalIssueManager issugMgr = new LocalIssueManager();
+
+        Log.info(Main.class, "Will load and synchronize redmine issues and jira issues");
         issugMgr.loadAllRedmineIssue(redmine.getIssueManager());
         issugMgr.loadAllJiraIssue();
         issugMgr.compareIssues(new IssueCompareCallback() {
