@@ -110,8 +110,9 @@ public class DefaultIssueHandler extends AbstractIssueHandler {
     @Override
     public boolean onSynchronize(Issue redmine, JiraIssue jira) {
         boolean ret = false;
+        ret |= syncSubject(redmine, jira);
         ret |= syncStatus(redmine, jira);
-//        ret |= syncAssignerAndGroup(redmine, jira);
+        ret |= syncAssignerAndGroup(redmine, jira);
         ret |= syncPriority(redmine, jira);
         // TODO more info
         return ret;
