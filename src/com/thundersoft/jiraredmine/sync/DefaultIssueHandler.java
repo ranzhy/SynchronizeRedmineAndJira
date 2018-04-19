@@ -168,9 +168,14 @@ public class DefaultIssueHandler extends AbstractIssueHandler {
 
         LocalUser jiraUser = mAccountMgr.getUserByJiraId(jiraMail);
         LocalUser redmineUser = mAccountMgr.getUserByRedmineUserId(redmine.getAssigneeId());
-        if (jiraUser == null || redmineUser == null) {
-            System.err.println("User incorrect: " + jiraUser + " : " + redmineUser);
+        if ((jiraUser == null && jiraMail.endsWith(".ts")) || redmineUser == null) {
+            System.err.println("User incorrect: " + jiraUser
+                    + "(" + jiraMail + ") : " + redmineUser);
             return false;
+        }
+
+        if (jiraUser == null) {
+            jiraUser = mAccountMgr.getGroupByName("PMC").getLeader();
         }
 
         if (jiraUser.getGroupName().equals(redmineUser.getGroupName())) {

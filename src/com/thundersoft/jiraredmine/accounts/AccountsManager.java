@@ -96,4 +96,8 @@ public class AccountsManager {
             return null;
         }
     }
+
+    public LocalGroup getGroupByName(String group) {
+        return mGroups.get(group);
+    }
 }
