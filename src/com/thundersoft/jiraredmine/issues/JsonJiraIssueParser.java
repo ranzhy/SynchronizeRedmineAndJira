@@ -69,7 +69,8 @@ public class JsonJiraIssueParser implements IJiraIssueParser {
 
     @Override
     public String getAssigner() {
-        return getValue(getChiledObject(mJsonFields, "assignee"), "name");
+        String assigner =  getValue(getChiledObject(mJsonFields, "assignee"), "name");
+        return assigner == null ? "" : assigner;
     }
 
     @Override

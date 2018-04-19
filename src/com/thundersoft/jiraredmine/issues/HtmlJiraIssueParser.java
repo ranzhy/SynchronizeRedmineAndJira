@@ -64,7 +64,7 @@ public class HtmlJiraIssueParser implements IJiraIssueParser {
                 }
             }
         }
-        return null;
+        return "";
     }
 
     @Override
