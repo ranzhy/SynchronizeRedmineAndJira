@@ -36,15 +36,20 @@ public class LocalIssueManager {
     private Set<String> mJireKeys = new HashSet<String>(0);
     // private Map<String, JiraIssue> mJireIssues = new HashMap<String, JiraIssue>();
 
-    public void loadAllRedmineIssue(IssueManager issueMgr) throws RedmineException {
+    public void loadAllRedmineIssue(IssueManager issueMgr) {
         ServerConfig config = SystemConfig.getInstance().getServerConfig();
-        List<Issue> issues = issueMgr.getIssues(config.getRedmineProject(), null);
-        mRedmineIssues = new HashMap<String, Issue>(issues.size());
-        for (Issue issue : issues) {
-            String key = SystemConfig.getInstance().getContentConfig().getRedmineJiraBugkey();
-            CustomField field = issue.getCustomFieldByName(key);
-            key = field.getValue();
-            mRedmineIssues.put(key, issue);
+        List<Issue> issues;
+        try {
+            issues = issueMgr.getIssues(config.getRedmineProject(), null);
+            mRedmineIssues = new HashMap<String, Issue>(issues.size());
+            for (Issue issue : issues) {
+                String key = SystemConfig.getInstance().getContentConfig().getRedmineJiraBugkey();
+                CustomField field = issue.getCustomFieldByName(key);
+                key = field.getValue();
+                mRedmineIssues.put(key, issue);
+            }
+        } catch (RedmineException e) {
+            throw new RuntimeException("Load redmine issue failed, Abort", e);
         }
     }
 

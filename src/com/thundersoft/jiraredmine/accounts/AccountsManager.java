@@ -32,16 +32,14 @@ public class AccountsManager {
         for (User user : users) {
             loadLocalUserConfig(user);
         }
-//        loadLocalGroupInfo();
     }
 
     private List<User> loadRedmineUsers() {
         try {
             return mUserManager.getUsers();
         } catch (RedmineException e) {
-            Log.error(getClass(), "", e);
+            throw new RuntimeException("Load redmine users failed, Abort", e);
         }
-        return new ArrayList<User>();
     }
 
     private void loadLocalUserConfig(User user) {
