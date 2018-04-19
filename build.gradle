@@ -30,6 +30,10 @@ dependencies {
 
     // https://mvnrepository.com/artifact/net.sourceforge.nekohtml/nekohtml
     compile group: 'net.sourceforge.nekohtml', name: 'nekohtml', version: '1.9.22'
+
+    // https://mvnrepository.com/artifact/org.slf4j/slf4j-log4j12
+    compile group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.25'
+
 }
 
 jar {

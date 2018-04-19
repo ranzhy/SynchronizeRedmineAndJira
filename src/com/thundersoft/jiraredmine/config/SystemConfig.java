@@ -13,6 +13,7 @@ import com.taskadapter.redmineapi.RedmineManager;
 import com.thundersoft.jiraredmine.accounts.AccountsManager;
 import com.thundersoft.jiraredmine.issues.IssuePriorityManager;
 import com.thundersoft.jiraredmine.issues.IssueStatusManager;
+import com.thundersoft.jiraredmine.logger.Log;
 import com.thundersoft.jiraredmine.sync.AbstractIssueHandler;
 import com.thundersoft.jiraredmine.sync.DefaultIssueHandler;
 
@@ -55,14 +56,14 @@ public class SystemConfig extends Properties {
             in = new FileInputStream(getConfig());
             load(in);
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.error(getClass(), "", e);
         } finally {
             if (in != null) {
                 try {
                     in.close();
                 } catch (IOException e) {
                     // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    Log.error(getClass(), "", e);
                 }
             }
         }
@@ -97,34 +98,34 @@ public class SystemConfig extends Properties {
                     if (obj instanceof AbstractIssueHandler) {
                         handler = (AbstractIssueHandler) obj;
                     } else {
-                        System.out.println("issue handler must extends AbstractIssueHandler, Incorrect issue handler: " + obj);
+                        Log.error(getClass(), "issue handler must extends AbstractIssueHandler, Incorrect issue handler: " + obj);
                     }
                 }
             } catch (ClassNotFoundException e) {
                 // TODO Auto-generated catch block
-                e.printStackTrace();
+                Log.error(getClass(), "", e);
             } catch (NoSuchMethodException e) {
                 // TODO Auto-generated catch block
-                e.printStackTrace();
+                Log.error(getClass(), "", e);
             } catch (SecurityException e) {
                 // TODO Auto-generated catch block
-                e.printStackTrace();
+                Log.error(getClass(), "", e);
             } catch (InstantiationException e) {
                 // TODO Auto-generated catch block
-                e.printStackTrace();
+                Log.error(getClass(), "", e);
             } catch (IllegalAccessException e) {
                 // TODO Auto-generated catch block
-                e.printStackTrace();
+                Log.error(getClass(), "", e);
             } catch (IllegalArgumentException e) {
                 // TODO Auto-generated catch block
-                e.printStackTrace();
+                Log.error(getClass(), "", e);
             } catch (InvocationTargetException e) {
                 // TODO Auto-generated catch block
-                e.printStackTrace();
+                Log.error(getClass(), "", e);
             }
         }
         if (handler == null) {
-            System.out.println("Will use the default issue handler");
+            Log.info(getClass(), "Will use the default issue handler");
             handler = new DefaultIssueHandler(redmine);
         }
         return handler;
@@ -139,7 +140,7 @@ public class SystemConfig extends Properties {
                 mServerConfig.load(in);
             } catch (IOException e) {
                 // TODO Auto-generated catch block
-                e.printStackTrace();
+                Log.error(getClass(), "", e);
                 mServerConfig = null;
             } finally {
                 if (in != null) {
@@ -147,7 +148,7 @@ public class SystemConfig extends Properties {
                         in.close();
                     } catch (IOException e) {
                         // TODO Auto-generated catch block
-                        e.printStackTrace();
+                        Log.error(getClass(), "", e);
                     }
                 }
             }
@@ -164,7 +165,7 @@ public class SystemConfig extends Properties {
                 mContentConfig.load(in);
             } catch (IOException e) {
                 // TODO Auto-generated catch block
-                e.printStackTrace();
+                Log.error(getClass(), "", e);
                 mContentConfig = null;
             } finally {
                 if (in != null) {
@@ -172,7 +173,7 @@ public class SystemConfig extends Properties {
                         in.close();
                     } catch (IOException e) {
                         // TODO Auto-generated catch block
-                        e.printStackTrace();
+                        Log.error(getClass(), "", e);
                     }
                 }
             }

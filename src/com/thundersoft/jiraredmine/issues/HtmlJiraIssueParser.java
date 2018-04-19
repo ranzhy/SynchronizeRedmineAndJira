@@ -11,6 +11,8 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import com.thundersoft.jiraredmine.logger.Log;
+
 public class HtmlJiraIssueParser implements IJiraIssueParser {
 
     Document doc = null;
@@ -23,7 +25,7 @@ public class HtmlJiraIssueParser implements IJiraIssueParser {
             parser.parse(inputSource);
             doc = parser.getDocument();
         } catch (SAXException | IOException e) {
-            e.printStackTrace();
+            Log.error(getClass(), "", e);
             return false;
         }
         return true;

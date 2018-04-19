@@ -6,6 +6,7 @@ import com.taskadapter.redmineapi.RedmineManager;
 import com.thundersoft.jiraredmine.accounts.AccountsManager;
 import com.thundersoft.jiraredmine.issues.IssuePriorityManager;
 import com.thundersoft.jiraredmine.issues.IssueStatusManager;
+import com.thundersoft.jiraredmine.logger.Log;
 
 public abstract class AbstractIssueHandler implements IIssueHandler {
 
@@ -22,7 +23,7 @@ public abstract class AbstractIssueHandler implements IIssueHandler {
             mStatusMgr = new IssueStatusManager(redmine.getIssueManager().getStatuses());
             mPriorityMgr = new IssuePriorityManager(redmine.getIssueManager().getIssuePriorities());
         } catch (RedmineException e) {
-            e.printStackTrace();
+            Log.error(getClass(), "", e);
         }
         mCustomFieldMgr = redmine.getCustomFieldManager();
     }

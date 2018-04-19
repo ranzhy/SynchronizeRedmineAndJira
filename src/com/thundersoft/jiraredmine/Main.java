@@ -8,21 +8,20 @@ import com.taskadapter.redmineapi.RedmineException;
 import com.taskadapter.redmineapi.RedmineManager;
 import com.taskadapter.redmineapi.RedmineManagerFactory;
 import com.taskadapter.redmineapi.bean.Issue;
-import com.thundersoft.jiraredmine.accounts.AccountsManager;
 import com.thundersoft.jiraredmine.config.ServerConfig;
 import com.thundersoft.jiraredmine.config.SystemConfig;
-import com.thundersoft.jiraredmine.issues.IssuePriorityManager;
-import com.thundersoft.jiraredmine.issues.IssueStatusManager;
 import com.thundersoft.jiraredmine.issues.JiraIssue;
 import com.thundersoft.jiraredmine.issues.LocalIssueManager;
 import com.thundersoft.jiraredmine.issues.LocalIssueManager.IssueCompareCallback;
+import com.thundersoft.jiraredmine.logger.Log;
 import com.thundersoft.jiraredmine.sync.AbstractIssueHandler;
 import com.thundersoft.jiraredmine.sync.RedmineSynchronizer;
 
 public class Main {
 
-    public static void main(String[] args) throws RedmineException, IOException, SAXException {
+    public static void main(String[] args) throws RedmineException {
         System.setProperty ("jsse.enableSNIExtension", "false");
+
         SystemConfig system = SystemConfig.getInstance();
         ServerConfig config = system.getServerConfig();
 
@@ -40,8 +39,7 @@ public class Main {
                 try {
                     synchronizer.synchronize(redmine, jira);
                 } catch (RedmineException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    Log.error(getClass(), "", e);
                 }
             }
 
@@ -49,7 +47,7 @@ public class Main {
             public void onCompareCompleted() {
             }
         });
-        System.out.println("=========== Issue Syncronize completed =====================");
+        Log.info(Main.class, "=========== Issue Syncronize completed =====================");
     }
 
 }

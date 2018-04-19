@@ -23,6 +23,7 @@ import com.taskadapter.redmineapi.bean.CustomField;
 import com.taskadapter.redmineapi.bean.Issue;
 import com.thundersoft.jiraredmine.config.ServerConfig;
 import com.thundersoft.jiraredmine.config.SystemConfig;
+import com.thundersoft.jiraredmine.logger.Log;
 
 public class LocalIssueManager {
 
@@ -66,11 +67,11 @@ public class LocalIssueManager {
                 mJireKeys.add(key);
             }
         } catch (JSONException e) {
-            e.printStackTrace();
+            Log.error(getClass(), "", e);
         }
     }
 
-    public void compareIssues(IssueCompareCallback callback) throws IOException, SAXException {
+    public void compareIssues(IssueCompareCallback callback) {
         Set<String> keies = new HashSet<String>(mJireKeys);
         keies.addAll(mRedmineIssues.keySet());
         for (String bugKey : keies) {
@@ -80,7 +81,7 @@ public class LocalIssueManager {
             if (issue == null && (!jira.isValidIssue() ||
                     !jira.getAssigner().endsWith(".ts"))) {
                 // Skip the issue, it's not relate with Thundersoft
-                System.out.println("Skipping " + jira);
+                Log.info(getClass(), "Skipping " + jira);
                 continue;
             }
             callback.onCompare(issue, jira);

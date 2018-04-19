@@ -47,7 +47,6 @@ public class IssuePriorityManager {
 
             String values = config.getProperty(ContentConfig.PRIORITY_CONFIG_KEY + priority.getName());
             if (values == null) {
-                System.err.println("There is not config " + ContentConfig.PRIORITY_CONFIG_KEY + priority.getName());
                 throw new RuntimeException(
                         "There is not config " + ContentConfig.PRIORITY_CONFIG_KEY + priority.getName());
             }

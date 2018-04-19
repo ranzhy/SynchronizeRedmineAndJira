@@ -11,6 +11,7 @@ import com.taskadapter.redmineapi.UserManager;
 import com.taskadapter.redmineapi.bean.User;
 import com.thundersoft.jiraredmine.config.ContentConfig;
 import com.thundersoft.jiraredmine.config.SystemConfig;
+import com.thundersoft.jiraredmine.logger.Log;
 
 public class AccountsManager {
 
@@ -38,7 +39,7 @@ public class AccountsManager {
         try {
             return mUserManager.getUsers();
         } catch (RedmineException e) {
-            e.printStackTrace();
+            Log.error(getClass(), "", e);
         }
         return new ArrayList<User>();
     }
@@ -74,7 +75,7 @@ public class AccountsManager {
             group.setLeader(localUser);
         }
         group.add(localUser);
-        System.out.println("Add " + jiraId + "(" + mail + ")" + user.getFullName() + " to " + group);
+        Log.debug(getClass(), "Add " + jiraId + "(" + mail + ")" + user.getFullName() + " to " + group);
     }
 
     public LocalUser getUserByJiraId(String id) {
@@ -92,7 +93,7 @@ public class AccountsManager {
             return getUserByJiraId(mail);
         } catch (RedmineException e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            Log.error(getClass(), "", e);
             return null;
         }
     }

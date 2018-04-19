@@ -22,6 +22,7 @@ import com.thundersoft.jiraredmine.config.SystemConfig;
 import com.thundersoft.jiraredmine.issues.IssuePriorityManager;
 import com.thundersoft.jiraredmine.issues.IssueStatusManager;
 import com.thundersoft.jiraredmine.issues.JiraIssue;
+import com.thundersoft.jiraredmine.logger.Log;
 
 public class DefaultIssueHandler extends AbstractIssueHandler {
 
@@ -48,7 +49,7 @@ public class DefaultIssueHandler extends AbstractIssueHandler {
                 }
             }
         } catch (RedmineException e) {
-            e.printStackTrace();
+            Log.error(getClass(), "", e);
             return null;
         }
 
@@ -73,7 +74,7 @@ public class DefaultIssueHandler extends AbstractIssueHandler {
         if (!(addCustomField(issue, "JIRA-BUG", jira.getKey())
                 && addCustomField(issue, "JiraUrl", jira.getBrowseUrl())
                 && addCustomField(issue, "Group", group.getGroupName()))) {
-            System.err.println("Creating redmine issue failed: " + issue + " for " + jira);
+            Log.error(getClass(), "Creating redmine issue failed: " + issue + " for " + jira);
             return null;
         }
 
@@ -92,7 +93,7 @@ public class DefaultIssueHandler extends AbstractIssueHandler {
                 }
             }
         } catch (RedmineException e) {
-            e.printStackTrace();
+            Log.error(getClass(), "", e);
         }
         return false;
     }
@@ -119,7 +120,7 @@ public class DefaultIssueHandler extends AbstractIssueHandler {
     }
 
     protected void addComment(Issue redmine, String comment) {
-        System.out.println(comment + " for " + redmine);
+        Log.debug(getClass(), comment + " for " + redmine);
         String old = redmine.getNotes();
         if (old != null && !old.trim().isEmpty()) {
             comment = old + "\r\n" + comment;
@@ -169,7 +170,7 @@ public class DefaultIssueHandler extends AbstractIssueHandler {
         LocalUser jiraUser = mAccountMgr.getUserByJiraId(jiraMail);
         LocalUser redmineUser = mAccountMgr.getUserByRedmineUserId(redmine.getAssigneeId());
         if ((jiraUser == null && jiraMail.endsWith(".ts")) || redmineUser == null) {
-            System.err.println("User incorrect: " + jiraUser
+            Log.error(getClass(), "User incorrect: " + jiraUser
                     + "(" + jiraMail + ") : " + redmineUser + "(" + redmine.getAssigneeName() + ")");
             return false;
         }
@@ -224,7 +225,7 @@ public class DefaultIssueHandler extends AbstractIssueHandler {
 
     @Override
     public void onJiraIssueMissed(Issue redmine) {
-        System.out.println("Missed " + redmine.getStatusName() + " jira issue for " + redmine);
+        Log.info(getClass(), "Missed " + redmine.getStatusName() + " jira issue for " + redmine);
     }
 
 }

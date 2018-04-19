@@ -4,6 +4,7 @@ import com.taskadapter.redmineapi.IssueManager;
 import com.taskadapter.redmineapi.RedmineException;
 import com.taskadapter.redmineapi.bean.Issue;
 import com.thundersoft.jiraredmine.issues.JiraIssue;
+import com.thundersoft.jiraredmine.logger.Log;
 
 public class RedmineSynchronizer {
 
@@ -32,7 +33,7 @@ public class RedmineSynchronizer {
         Issue redmine = mCallback.onRedmineIssueMissed(jira);
         if (redmine != null) {
             redmine = mIssueMgr.createIssue(redmine);
-            System.out.println("Added " + redmine + " for " + jira);
+            Log.info(getClass(), "Added " + redmine + " for " + jira);
         }
     }
 

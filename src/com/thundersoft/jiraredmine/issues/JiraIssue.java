@@ -20,6 +20,7 @@ import org.xml.sax.SAXException;
 
 import com.thundersoft.jiraredmine.config.ServerConfig;
 import com.thundersoft.jiraredmine.config.SystemConfig;
+import com.thundersoft.jiraredmine.logger.Log;
 
 public class JiraIssue {
 
@@ -43,7 +44,7 @@ public class JiraIssue {
 
     private void initialize() {
         if (!initialize(mDataUrl, new JsonJiraIssueParser())) {
-            System.err.println("Rest API failed for " + mDataUrl + ", try " + mBrowseUrl);
+            Log.error(getClass(), "Rest API failed for " + mDataUrl + ", try " + mBrowseUrl);
             initialize(mBrowseUrl, new HtmlJiraIssueParser());
         }
     }

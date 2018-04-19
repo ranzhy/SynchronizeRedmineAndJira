@@ -13,6 +13,7 @@ import org.apache.commons.codec.binary.Base64;
 
 import com.thundersoft.jiraredmine.config.ServerConfig;
 import com.thundersoft.jiraredmine.config.SystemConfig;
+import com.thundersoft.jiraredmine.logger.Log;
 
 public class JiraClient {
 
@@ -41,12 +42,12 @@ public class JiraClient {
             }
             return doRead(conn);
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.error(getClass(), "", e);
         } finally {
             try {
                 if (out != null ) out.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                Log.error(getClass(), "", e);
             }
             if (conn != null) {
                 conn.disconnect();
@@ -67,14 +68,14 @@ public class JiraClient {
             }
             return buffer.toString();
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.error(getClass(), "", e);
             return null;
         } finally {
             if (reader != null) {
                 try {
                     reader.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    Log.error(getClass(), "", e);
                 }
             }
             conn.disconnect();
@@ -101,7 +102,7 @@ public class JiraClient {
 //            return out;
             return null;
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.error(getClass(), "", e);
             return null;
         }
     }

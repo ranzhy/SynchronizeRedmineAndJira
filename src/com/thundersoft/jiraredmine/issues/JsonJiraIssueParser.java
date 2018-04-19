@@ -8,6 +8,8 @@ import java.io.InputStreamReader;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.thundersoft.jiraredmine.logger.Log;
+
 public class JsonJiraIssueParser implements IJiraIssueParser {
 
     private JSONObject mJsonObj;
@@ -25,7 +27,7 @@ public class JsonJiraIssueParser implements IJiraIssueParser {
             mJsonObj = new JSONObject(buffer.toString());
             mJsonFields = mJsonObj.getJSONObject("fields");
         } catch (IOException | JSONException e) {
-           System.err.println("[JsonJiraIssueParser] : " + e.getMessage());
+           Log.error(getClass(), "", e);
         }
         return mJsonObj != null && mJsonFields != null;
     }
@@ -34,8 +36,8 @@ public class JsonJiraIssueParser implements IJiraIssueParser {
         try {
             return obj == null ? null : obj.getString(key);
         } catch (JSONException e) {
-            System.err.println("[JsonJiraIssueParser]getValue("
-                    + obj + ", " + key + ") : " + e.getMessage());
+            Log.error(getClass(),"[JsonJiraIssueParser]getValue("
+                    + obj + ", " + key + ")", e);
         }
         return null;
     }
@@ -44,8 +46,8 @@ public class JsonJiraIssueParser implements IJiraIssueParser {
         try {
             return obj == null ? null : obj.getJSONObject(key);
         } catch (JSONException e) {
-            System.err.println("[JsonJiraIssueParser]getChiledObject("
-                    + obj + ", " + key + ") : " + e.getMessage());
+            Log.error(getClass(),"[JsonJiraIssueParser]getChiledObject("
+                    + obj + ", " + key + ")", e);
         }
         return null;
     }

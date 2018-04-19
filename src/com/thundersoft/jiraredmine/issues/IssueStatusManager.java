@@ -8,6 +8,7 @@ import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.bean.IssueStatus;
 import com.thundersoft.jiraredmine.config.ContentConfig;
 import com.thundersoft.jiraredmine.config.SystemConfig;
+import com.thundersoft.jiraredmine.logger.Log;
 
 public class IssueStatusManager {
 
@@ -47,7 +48,7 @@ public class IssueStatusManager {
 
             String values = config.getProperty(ContentConfig.STATUS_CONFIG_KEY + status.getName());
             if (values == null) {
-                System.err.println("There is not config " + ContentConfig.STATUS_CONFIG_KEY + status.getName());
+                Log.error(getClass(), "There is not config " + ContentConfig.STATUS_CONFIG_KEY + status.getName());
 //                throw new RuntimeException(
 //                        "There is not config " + ContentConfig.STATUS_CONFIG_KEY + status.getName());
                 continue;
