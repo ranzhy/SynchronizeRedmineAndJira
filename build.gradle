@@ -3,10 +3,10 @@ apply plugin: 'maven'
 apply plugin: 'application'
 
 group = 'com.thundersoft'
-version = '0.7-dev'
+version = '1.0-dev'
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
