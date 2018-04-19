@@ -170,7 +170,7 @@ public class DefaultIssueHandler extends AbstractIssueHandler {
         LocalUser redmineUser = mAccountMgr.getUserByRedmineUserId(redmine.getAssigneeId());
         if ((jiraUser == null && jiraMail.endsWith(".ts")) || redmineUser == null) {
             System.err.println("User incorrect: " + jiraUser
-                    + "(" + jiraMail + ") : " + redmineUser);
+                    + "(" + jiraMail + ") : " + redmineUser + "(" + redmine.getAssigneeName() + ")");
             return false;
         }
 
