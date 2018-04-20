@@ -1,13 +1,13 @@
 package com.thundersoft.jiraredmine.issues;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.PrintWriter;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
+import java.nio.ByteBuffer;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.codec.binary.Base64;
 
@@ -16,6 +16,8 @@ import com.thundersoft.jiraredmine.config.SystemConfig;
 import com.thundersoft.jiraredmine.logger.Log;
 
 public class JiraClient {
+
+    private static final int DEFAULT_BUFFERF_SIZE = 1024 * 10; // 1M
 
     private static JiraClient INSTANCE = new JiraClient();
     
@@ -30,22 +32,22 @@ public class JiraClient {
         return doLoad(url);
     }
 
-    
     private String doLoad(String url) {
+        InputStream in = null;
         HttpURLConnection conn = null;
-        OutputStream out = null;
         try {
             conn = (HttpURLConnection) new URL(url).openConnection();
-            out = doPreload(conn);
             if (conn == null) {
                 return null;
             }
-            return doRead(conn);
+            doPreload(conn);
+            in = doConnection(conn);
+            return doRead(in);
         } catch (IOException e) {
             Log.error(getClass(), "", e);
         } finally {
             try {
-                if (out != null ) out.close();
+                if (in != null) in.close();
             } catch (IOException e) {
                 Log.error(getClass(), "", e);
             }
@@ -57,66 +59,57 @@ public class JiraClient {
 
     }
 
-    private String doRead(HttpURLConnection conn) {
-        BufferedReader reader = null;
+    private InputStream doConnection(HttpURLConnection conn) {
         try {
-            reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            StringBuffer buffer = new StringBuffer();
-            String line = null;
-            while ((line = reader.readLine()) != null) {
-                buffer.append(line);
+            Log.debug(getClass(), " >> " + conn.getRequestMethod() + " " + conn.getURL());
+            Map<String, List<String>> request = conn.getRequestProperties();
+            for (String key :  request.keySet()) {
+                Log.debug(getClass(), " >> " + key + " : " + request.get(key).get(0));
             }
-            return buffer.toString();
-        } catch (IOException e) {
-            Log.error(getClass(), "", e);
-            return null;
-        } finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    Log.error(getClass(), "", e);
-                }
-            }
-            conn.disconnect();
-        }
 
+            conn.connect();
+            Map<String, List<String>> resp = new HashMap<String, List<String>>(conn.getHeaderFields());
+            Log.debug(getClass(), " << " + resp.remove(null).get(0));
+            for (String key :  resp.keySet()) {
+                Log.debug(getClass(), " << " + key + " : " + resp.get(key).get(0));
+            }
+            return conn.getInputStream();
+        } catch (IOException e) {
+            Log.error(getClass(), "Connecting failed : " + conn.getURL(), e);
+        }
+        return null;
     }
 
-    private OutputStream doPreload(HttpURLConnection conn) {
-        OutputStream out = null;
-        try {
-//            conn.setDoOutput(true);
-//            conn.setDoInput(true);
-            conn.setRequestMethod("GET");
-
-            ServerConfig config = SystemConfig.getInstance().getServerConfig();
-            String user = config.getJiraLoginUser();
-            String pwd = config.getJiraLoginPasswd();
-
-            String authKey = "Basic " + Base64.encodeBase64String(
-                    (user + ':' + pwd).getBytes("UTF-8")).trim();
-            conn.setRequestProperty("Authorization", authKey);
-//            out = conn.getOutputStream();
-//            writePostData(out);
-//            return out;
-            return null;
-        } catch (IOException e) {
-            Log.error(getClass(), "", e);
-            return null;
-        }
+    private String doRead(InputStream in) throws IOException {
+        int len = 0;
+        ByteBuffer buffer = ByteBuffer.allocate(DEFAULT_BUFFERF_SIZE);
+        while ((len = in.read(buffer.array(), buffer.position(), buffer.remaining())) >= 0) {
+            buffer.position(buffer.position() + len);
+            if (!buffer.hasRemaining()) {
+                ByteBuffer tmp = buffer;
+                buffer = ByteBuffer.allocate(DEFAULT_BUFFERF_SIZE + buffer.capacity());
+                buffer.put(tmp.array());
+            }
+        };
+        String content = new String(buffer.array(), 0, buffer.position(),"UTF-8");
+        Log.debug(getClass(), "<< " + content);
+        return content;
     }
 
-    private String postLoginData() {
+    private void doPreload(HttpURLConnection conn) {
         ServerConfig config = SystemConfig.getInstance().getServerConfig();
         String user = config.getJiraLoginUser();
         String pwd = config.getJiraLoginPasswd();
-        return "os_username=" + user + "&os_password=" + pwd;
-    }
 
-    private void writePostData(OutputStream out) {
-        PrintWriter print = new PrintWriter(out);
-        print.print(postLoginData());
-        print.flush();
+        try {
+            String authKey = "Basic " + Base64.encodeBase64String(
+                    (user + ':' + pwd).getBytes("UTF-8")).trim();
+
+            conn.setDoInput(true);
+            conn.setRequestMethod("GET");
+            conn.setRequestProperty("Authorization", authKey);
+        } catch (IOException e) {
+            Log.error(getClass(), "", e);
+        }
     }
 }

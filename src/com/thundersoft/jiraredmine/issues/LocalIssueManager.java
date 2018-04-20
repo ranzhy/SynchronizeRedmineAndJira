@@ -86,7 +86,7 @@ public class LocalIssueManager {
             if (issue == null && (!jira.isValidIssue() ||
                     !jira.getAssigner().endsWith(".ts"))) {
                 // Skip the issue, it's not relate with Thundersoft
-                Log.info(getClass(), "Skipping " + jira);
+                Log.info(getClass(), "Never tracing the issue: " + jira);
                 continue;
             }
             callback.onCompare(issue, jira);

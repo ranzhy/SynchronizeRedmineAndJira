@@ -63,7 +63,7 @@ public class DefaultIssueHandler extends AbstractIssueHandler {
 
         LocalUser user = mAccountMgr.getUserByJiraId(jira.getAssigner());
         if (user == null) {
-            System.err.println("[onRedmineIssueMissed] Skiping " + jira);
+            Log.error(getClass(), "[onRedmineIssueMissed] Skiping " + jira);
             return null;
         }
         LocalGroup group = user.getGroup();
@@ -120,10 +120,10 @@ public class DefaultIssueHandler extends AbstractIssueHandler {
     }
 
     protected void addComment(Issue redmine, String comment) {
-        Log.debug(getClass(), comment + " for " + redmine);
+        Log.info(getClass(), comment + " for " + redmine);
         String old = redmine.getNotes();
         if (old != null && !old.trim().isEmpty()) {
-            comment = old + "\r\n" + comment;
+            comment = old + "\n" + comment;
         }
         redmine.setNotes(comment);
     }

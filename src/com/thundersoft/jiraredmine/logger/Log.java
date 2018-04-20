@@ -15,7 +15,9 @@ public class Log {
             System.err.println("log4j2 config file:" + configFile.getAbsolutePath() + " not exist");
             System.exit(0);
         }
-        String file = "file://" + configFile.getAbsolutePath();
+        String file = configFile.getAbsolutePath();
+        int startIdx = file.indexOf(":");
+        file = "file://" + (startIdx >= 0 ? file.substring(startIdx + 1) : file);
         System.out.println("log4j2 config file: " + file);
 
         try {
