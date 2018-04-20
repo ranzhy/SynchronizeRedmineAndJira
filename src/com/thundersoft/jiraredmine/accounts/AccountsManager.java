@@ -50,7 +50,7 @@ public class AccountsManager {
             String[] ids = jiraIds.split(",");
             for (String jiraId : ids) {
                 if (jiraId != null && !jiraId.trim().isEmpty()) {
-                    addMatchedUser(user, jiraId.trim());
+                    addMatchedUser(user, jiraId.trim(), true);
                 }
             }
         }
@@ -60,13 +60,13 @@ public class AccountsManager {
         if (mail.endsWith("thundersoft.com")) {
             jiraId += ".ts";
         }
-        addMatchedUser(user, jiraId);
+        addMatchedUser(user, jiraId, false);
     }
 
-    private void addMatchedUser(User user, String jiraId) {
+    private void addMatchedUser(User user, String jiraId, boolean config) {
         String mail = user.getMail();
         LocalUser localUser = new LocalUser(user, jiraId);
-        putUser(jiraId, localUser);
+        putUser(jiraId, localUser, config);
 
         String groupName = user.getFirstName();
         if (mail.endsWith("thundersoft.com")) {
@@ -89,11 +89,13 @@ public class AccountsManager {
         Log.debug(getClass(), "Add " + jiraId + "(" + mail + ")" + user.getFullName() + " to " + group);
     }
 
-    private void putUser(String id, LocalUser user) {
+    private void putUser(String id, LocalUser user, boolean force) {
         if (id.endsWith(".ts")) {
             id = id.replace(".ts", "");
         }
-        mUsers.put(id, user);
+        if (mUsers.get(id) == null || force) {
+            mUsers.put(id, user);
+        }
     }
 
     public LocalUser getUserByJiraId(String id) {
