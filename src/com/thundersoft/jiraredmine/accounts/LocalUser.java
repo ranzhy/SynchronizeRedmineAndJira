@@ -48,6 +48,6 @@ public class LocalUser {
     }
  
     public String toString() {
-        return "[" + mRedmineUser + "@" + getGroupName() + "]";
+        return "[" + mJiraUserKey + "@" + getGroupName() + "]";
     }
 }

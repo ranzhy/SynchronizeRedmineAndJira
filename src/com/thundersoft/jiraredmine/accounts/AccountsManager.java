@@ -45,15 +45,28 @@ public class AccountsManager {
     private void loadLocalUserConfig(User user) {
         String mail = user.getMail();
         String id = mail.split("\\@")[0].trim();
-        String jiraId = (String) mContentConfig.get(ContentConfig.USERS_CONFIG_KEY + id);
-        if (jiraId == null || jiraId.trim().isEmpty()) {
-            jiraId = id;
-            if (mail.endsWith("thundersoft.com")) {
-                jiraId += ".ts";
+        String jiraIds = (String) mContentConfig.get(ContentConfig.USERS_CONFIG_KEY + id);
+        if (jiraIds != null && !jiraIds.trim().isEmpty()) {
+            String[] ids = jiraIds.split(",");
+            for (String jiraId : ids) {
+                if (jiraId != null && !jiraId.trim().isEmpty()) {
+                    addMatchedUser(user, jiraId.trim());
+                }
             }
         }
+
+        // Self is added at last to ensure the leader is correct
+        String jiraId = id;
+        if (mail.endsWith("thundersoft.com")) {
+            jiraId += ".ts";
+        }
+        addMatchedUser(user, jiraId);
+    }
+
+    private void addMatchedUser(User user, String jiraId) {
+        String mail = user.getMail();
         LocalUser localUser = new LocalUser(user, jiraId);
-        mUsers.put(id, localUser);
+        putUser(jiraId, localUser);
 
         String groupName = user.getFirstName();
         if (mail.endsWith("thundersoft.com")) {
@@ -74,6 +87,13 @@ public class AccountsManager {
         }
         group.add(localUser);
         Log.debug(getClass(), "Add " + jiraId + "(" + mail + ")" + user.getFullName() + " to " + group);
+    }
+
+    private void putUser(String id, LocalUser user) {
+        if (id.endsWith(".ts")) {
+            id = id.replace(".ts", "");
+        }
+        mUsers.put(id, user);
     }
 
     public LocalUser getUserByJiraId(String id) {
