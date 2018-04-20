@@ -168,15 +168,15 @@ public class DefaultIssueHandler extends AbstractIssueHandler {
         String jiraMail = jiraAssigner;
 
         LocalUser jiraUser = mAccountMgr.getUserByJiraId(jiraMail);
+        if (jiraUser == null && !jiraMail.endsWith(".ts")) {
+            jiraUser = mAccountMgr.getGroupByName("PMC").getLeader();
+        }
+
         LocalUser redmineUser = mAccountMgr.getUserByRedmineUserId(redmine.getAssigneeId());
-        if ((jiraUser == null && jiraMail.endsWith(".ts")) || redmineUser == null) {
+        if (jiraUser == null || redmineUser == null) {
             Log.error(getClass(), "User incorrect: " + jiraUser
                     + "(" + jiraMail + ") : " + redmineUser + "(" + redmine.getAssigneeName() + ")");
             return false;
-        }
-
-        if (jiraUser == null) {
-            jiraUser = mAccountMgr.getGroupByName("PMC").getLeader();
         }
 
         if (jiraUser.getGroupName().equals(redmineUser.getGroupName())) {
@@ -187,7 +187,7 @@ public class DefaultIssueHandler extends AbstractIssueHandler {
         boolean ret = false;
         if ("PMC".equals(jiraUser.getGroupName())) {
             ret = updateGroupAndAssigner(redmine, jiraUser, true);
-        } else if ("PMC".equals(redmineUser.getGroupName())) {
+        } else {
             ret = updateGroupAndAssigner(redmine, jiraUser, false);
         }
         return ret;
