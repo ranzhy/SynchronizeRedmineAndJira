@@ -83,11 +83,17 @@ public class JiraIssue {
     }
 
     public boolean isRejected() {
-        return !"NONE".equalsIgnoreCase(getRejects());
+        String reject = getRejects();
+        return reject == null || reject.isEmpty() ||
+                !"NONE".equalsIgnoreCase(reject);
     }
 
     public String getAssigner() {
-        return mParser == null ? null : mParser.getAssigner();
+        String assigner = mParser == null ? null : mParser.getAssigner();
+        if (mParser != null && (assigner == null || assigner.isEmpty())) {
+            assigner = mParser.getReporter();
+        }
+        return assigner;
     }
 
     public String getPriority() {

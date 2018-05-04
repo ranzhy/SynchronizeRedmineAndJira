@@ -83,4 +83,10 @@ public class JsonJiraIssueParser implements IJiraIssueParser {
         return getValue(getChiledObject(mJsonFields, "priority"), "name");
     }
 
+    @Override
+    public String getReporter() {
+        String reporter =  getValue(getChiledObject(mJsonFields, "reporter"), "name");
+        return reporter == null ? "" : reporter;
+    }
+
 }

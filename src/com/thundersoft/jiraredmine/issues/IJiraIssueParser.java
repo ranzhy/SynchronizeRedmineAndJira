@@ -17,4 +17,6 @@ public interface IJiraIssueParser {
     public String getSubject();
 
     public String getPriority();
+
+    public String getReporter();
 }

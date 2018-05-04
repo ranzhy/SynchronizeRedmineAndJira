@@ -79,4 +79,22 @@ public class HtmlJiraIssueParser implements IJiraIssueParser {
         return priority_e.getTextContent().trim();
     }
 
+    @Override
+    public String getReporter() {
+        Element reporter_val = doc.getElementById("reporter-val");
+        NodeList reporters = reporter_val.getChildNodes();
+        String reporter = "";
+        for (int i = 0; i < reporters.getLength(); i++) {
+            Node node = reporters.item(i);
+            if (node instanceof Element) {
+                Element e = (Element) node;
+                reporter = e.getAttribute("rel");
+                if (reporter != null && !reporter.trim().isEmpty()) {
+                    return reporter.trim();
+                }
+            }
+        }
+        return "";
+    }
+
 }
