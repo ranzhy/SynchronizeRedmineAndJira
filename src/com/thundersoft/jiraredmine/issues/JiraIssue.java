@@ -92,7 +92,7 @@ public class JiraIssue {
 
     public String getAssigner() {
         String assigner = mAssigner;
-        if (assigner != null && !mAssigner.isEmpty()) {
+        if (assigner == null || mAssigner.isEmpty()) {
             assigner = mParser == null ? null : mParser.getAssigner();
             if (mParser != null && (assigner == null || assigner.isEmpty())) {
                 assigner = mParser.getReporter();
