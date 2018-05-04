@@ -86,7 +86,7 @@ public class JiraIssue {
 
     public boolean isRejected() {
         String reject = getRejects();
-        return reject == null || reject.isEmpty() ||
+        return reject != null && !reject.isEmpty() &&
                 !"NONE".equalsIgnoreCase(reject);
     }
 
