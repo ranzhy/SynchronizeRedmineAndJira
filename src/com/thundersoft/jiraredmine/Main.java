@@ -58,7 +58,8 @@ public class Main {
                 try {
                     synchronizer.synchronize(redmine, jira);
                 } catch (RedmineException e) {
-                    Log.error(getClass(), "", e);
+                    Log.error(getClass(),
+                            "Synchronizing jira [" + jira + "] and redmine [" + redmine + "]", e);
                 }
             }
 
