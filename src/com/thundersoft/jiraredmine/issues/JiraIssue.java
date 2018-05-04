@@ -30,6 +30,8 @@ public class JiraIssue {
 
     private IJiraIssueParser mParser;
 
+    private String mAssigner = "";
+
     protected JiraIssue(String bugKey){
         mKey = bugKey;
         ServerConfig config = SystemConfig.getInstance().getServerConfig();
@@ -89,9 +91,13 @@ public class JiraIssue {
     }
 
     public String getAssigner() {
-        String assigner = mParser == null ? null : mParser.getAssigner();
-        if (mParser != null && (assigner == null || assigner.isEmpty())) {
-            assigner = mParser.getReporter();
+        String assigner = mAssigner;
+        if (assigner != null && !mAssigner.isEmpty()) {
+            assigner = mParser == null ? null : mParser.getAssigner();
+            if (mParser != null && (assigner == null || assigner.isEmpty())) {
+                assigner = mParser.getReporter();
+            }
+            mAssigner = assigner;
         }
         return assigner;
     }
