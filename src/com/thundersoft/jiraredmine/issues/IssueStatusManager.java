@@ -88,7 +88,7 @@ public class IssueStatusManager {
     public IssueStatus getBetterRedmineIssueStatus(JiraIssue jira) {
         List<IssueStatus> list = getRedmineIssueStatus(jira);
         IssueStatus status = list.get(0);
-        if ("Vierified".equalsIgnoreCase(jira.getStatus()) && jira.isRejected()) {
+        if ("Verified".equalsIgnoreCase(jira.getStatus()) && jira.isRejected()) {
             for (IssueStatus stat : list) {
                 if ("Rejected".equals(stat.getName())) {
                     status = stat;
