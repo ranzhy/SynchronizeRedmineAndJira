@@ -24,6 +24,7 @@ public class RedmineSynchronizer {
         } else if (mCallback.checkIssueMatch(redmine, jira)){
             onUpdateRedmineIssue(redmine, jira);
         } else {
+            Log.info(getClass(), "redmine " + redmine + " not match with " + jira);
             onRedmineIssueMissed(jira);
             mCallback.onJiraIssueMissed(redmine);
         }
