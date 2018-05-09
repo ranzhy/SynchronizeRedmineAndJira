@@ -46,7 +46,7 @@ public class LocalIssueManager {
                 String key = SystemConfig.getInstance().getContentConfig().getRedmineJiraBugkey();
                 CustomField field = issue.getCustomFieldByName(key);
                 key = field.getValue();
-                mRedmineIssues.put(key, issue);
+                mRedmineIssues.put(key.trim(), issue);
             }
         } catch (RedmineException e) {
             throw new RuntimeException("Load redmine issue failed, Abort", e);
@@ -69,7 +69,7 @@ public class LocalIssueManager {
             mJireKeys = new HashSet<String>(total);
             for (int i = 0; i < total; i++) {
                 String key = array.getString(i);
-                mJireKeys.add(key);
+                mJireKeys.add(key.trim());
             }
         } catch (JSONException e) {
             Log.error(getClass(), "", e);
@@ -80,6 +80,7 @@ public class LocalIssueManager {
         Set<String> keies = new HashSet<String>(mJireKeys);
         keies.addAll(mRedmineIssues.keySet());
         for (String bugKey : keies) {
+            bugKey = bugKey.trim();
             mJireKeys.remove(bugKey);
             Issue issue = mRedmineIssues.remove(bugKey);
             JiraIssue jira = new JiraIssue(bugKey);
