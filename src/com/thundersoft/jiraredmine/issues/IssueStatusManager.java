@@ -103,4 +103,9 @@ public class IssueStatusManager {
         IssueStatus status = getRedmineIssueStatusByIssue(redmine);
         return mRedmineJira.get(status);
     }
+
+    public int getClosedStatusId() {
+        IssueStatus status = mNameToIssueStatus.get("Closed");
+        return (status != null ? status.getId() : -1);
+    }
 }

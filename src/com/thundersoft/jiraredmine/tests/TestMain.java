@@ -78,11 +78,11 @@ public class TestMain {
             }
         }
         HashMap<String, String> parameters = new HashMap<String, String>();
-        parameters.put("project_id", project.getId() + "");
-        parameters.put("status_id", rejected.getId() + "|" + closed.getId());
-        List<Issue> issues = issueManager.getIssues(project.getName(), null);
-//        ResultsWrapper<Issue> isues = issueManager.getIssues(parameters);
-        for (Issue issue : issues /*isues.getResults()*/) {
+        parameters.put("project_id", "vienna_us_jirabug");
+        parameters.put("status_id", "" + closed.getId());
+//        List<Issue> issues = issueManager.getIssues(project.getName(), null);
+        ResultsWrapper<Issue> isues = issueManager.getIssues(parameters);
+        for (Issue issue : /*issues*/ isues.getResults()) {
 //            System.out.println(issue + " : " + issue.getCustomFieldByName("JiraUrl"));
 //            if (checkJiraAndRedmine(issue)) {
 //                issueManager.update(issue);
@@ -90,7 +90,7 @@ public class TestMain {
             if ("Rejected".equals(issue.getStatusName())) {
                 System.err.println(issue.getStatusName() + " : " + issue);
             } else {
-//                System.out.println(issue.getStatusName() + " : " + issue);
+                System.out.println(issue.getStatusName() + " : " + issue);
             }
         }
     }
