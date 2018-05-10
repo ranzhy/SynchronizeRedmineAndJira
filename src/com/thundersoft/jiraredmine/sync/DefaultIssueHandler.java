@@ -224,8 +224,9 @@ public class DefaultIssueHandler extends AbstractIssueHandler {
     }
 
     @Override
-    public void onJiraIssueMissed(Issue redmine) {
+    public boolean onJiraIssueMissed(Issue redmine) {
         Log.info(getClass(), "Missed " + redmine.getStatusName() + " jira issue for " + redmine);
+        return true;
     }
 
 }

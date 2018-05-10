@@ -31,6 +31,7 @@ public interface IIssueHandler {
     /**
      * Called when the jira issue is missed.
      * @param redmine
+     * @return true, if the should be removed
      */
-    public void onJiraIssueMissed(Issue redmine);
+    public boolean onJiraIssueMissed(Issue redmine);
 }

@@ -8,6 +8,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -27,7 +28,9 @@ import com.taskadapter.redmineapi.RedmineManager;
 import com.taskadapter.redmineapi.RedmineManagerFactory;
 import com.taskadapter.redmineapi.bean.CustomField;
 import com.taskadapter.redmineapi.bean.Issue;
+import com.taskadapter.redmineapi.bean.IssueStatus;
 import com.taskadapter.redmineapi.bean.Project;
+import com.taskadapter.redmineapi.internal.ResultsWrapper;
 
 import org.cyberneko.html.parsers.DOMParser;
 import org.w3c.dom.Document;
@@ -63,11 +66,31 @@ public class TestMain {
 //        }
         Project project = manager.getProjectManager().getProjectByKey("vienna_us_jirabug");
         IssueManager issueManager = manager.getIssueManager();
+        List<IssueStatus> statuses = issueManager.getStatuses();
+        IssueStatus rejected = null;
+        IssueStatus closed = null;
+        for (IssueStatus status : statuses) {
+            System.out.println(status.getName() + " : " + status);
+            if ("Rejected".equals(status.getName())) {
+                rejected = status;
+            } else if ("Closed".equals(status.getName())) {
+                closed = status;
+            }
+        }
+        HashMap<String, String> parameters = new HashMap<String, String>();
+        parameters.put("project_id", project.getId() + "");
+        parameters.put("status_id", rejected.getId() + "|" + closed.getId());
         List<Issue> issues = issueManager.getIssues(project.getName(), null);
-        for (Issue issue : issues) {
+//        ResultsWrapper<Issue> isues = issueManager.getIssues(parameters);
+        for (Issue issue : issues /*isues.getResults()*/) {
 //            System.out.println(issue + " : " + issue.getCustomFieldByName("JiraUrl"));
-            if (checkJiraAndRedmine(issue)) {
-                issueManager.update(issue);
+//            if (checkJiraAndRedmine(issue)) {
+//                issueManager.update(issue);
+//            }
+            if ("Rejected".equals(issue.getStatusName())) {
+                System.err.println(issue.getStatusName() + " : " + issue);
+            } else {
+//                System.out.println(issue.getStatusName() + " : " + issue);
             }
         }
     }
@@ -85,7 +108,7 @@ public class TestMain {
         conn.setDoInput(true);
 
         PrintWriter out = new PrintWriter(conn.getOutputStream());
-        out.print("os_username=ranzy0631.ts&os_password=Apr4444444");
+        out.print("os_username=ranzy0631.ts&os_password=May5555555");
         out.flush();
 
         conn.connect();

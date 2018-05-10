@@ -54,9 +54,9 @@ public class Main {
         issugMgr.compareIssues(new IssueCompareCallback() {
 
             @Override
-            public void onCompare(Issue redmine, JiraIssue jira) {
+            public void onCompare(Issue redmine, JiraIssue jira, boolean clearRedmine) {
                 try {
-                    synchronizer.synchronize(redmine, jira);
+                    synchronizer.synchronize(redmine, jira, clearRedmine);
                 } catch (RedmineException e) {
                     Log.error(getClass(),
                             "Synchronizing jira [" + jira + "] and redmine [" + redmine + "]", e);

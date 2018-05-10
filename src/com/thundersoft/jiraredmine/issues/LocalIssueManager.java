@@ -1,10 +1,5 @@
 package com.thundersoft.jiraredmine.issues;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,7 +10,6 @@ import java.util.Set;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.xml.sax.SAXException;
 
 import com.taskadapter.redmineapi.IssueManager;
 import com.taskadapter.redmineapi.RedmineException;
@@ -28,11 +22,11 @@ import com.thundersoft.jiraredmine.logger.Log;
 public class LocalIssueManager {
 
     public static interface IssueCompareCallback {
-        public void onCompare(Issue redmine, JiraIssue jira);
+        public void onCompare(Issue redmine, JiraIssue jira, boolean clearRedmine);
         public void onCompareCompleted();
     }
 
-    private Map<String, Issue> mRedmineIssues = new HashMap<String, Issue>(0);
+    private Map<String, ArrayList<Issue>> mRedmineIssues = new HashMap<String, ArrayList<Issue>>(0);
     private Set<String> mJireKeys = new HashSet<String>(0);
     // private Map<String, JiraIssue> mJireIssues = new HashMap<String, JiraIssue>();
 
@@ -41,12 +35,17 @@ public class LocalIssueManager {
         List<Issue> issues;
         try {
             issues = issueMgr.getIssues(config.getRedmineProject(), null);
-            mRedmineIssues = new HashMap<String, Issue>(issues.size());
+            mRedmineIssues = new HashMap<String, ArrayList<Issue>>(issues.size());
             for (Issue issue : issues) {
                 String key = SystemConfig.getInstance().getContentConfig().getRedmineJiraBugkey();
                 CustomField field = issue.getCustomFieldByName(key);
-                key = field.getValue();
-                mRedmineIssues.put(key.trim(), issue);
+                key = field.getValue().trim();
+                ArrayList<Issue> issueList = mRedmineIssues.get(key);
+                if (issueList == null) {
+                    issueList = new ArrayList<Issue>(1);
+                }
+                issueList.add(issue);
+                mRedmineIssues.put(key, issueList);
             }
         } catch (RedmineException e) {
             throw new RuntimeException("Load redmine issue failed, Abort", e);
@@ -82,15 +81,25 @@ public class LocalIssueManager {
         for (String bugKey : keies) {
             bugKey = bugKey.trim();
             mJireKeys.remove(bugKey);
-            Issue issue = mRedmineIssues.remove(bugKey);
+            ArrayList<Issue> issueList = mRedmineIssues.remove(bugKey);
             JiraIssue jira = new JiraIssue(bugKey);
-            if (issue == null && (!jira.isValidIssue() ||
+            if (issueList == null && (!jira.isValidIssue() ||
                     !jira.getAssigner().endsWith(".ts"))) {
                 // Skip the issue, it's not relate with Thundersoft
                 Log.debug(getClass(), "Never tracing the issue: " + jira);
                 continue;
             }
-            callback.onCompare(issue, jira);
+            Issue issue = null;
+            if (issueList != null) {
+                issue = issueList.remove(0);
+            }
+            callback.onCompare(issue, jira, false);
+
+            if (issueList != null && !issueList.isEmpty()) {
+                for (Issue redmine : issueList) {
+                    callback.onCompare(redmine, null, true);
+                }
+            }
         }
         callback.onCompareCompleted();
     }
