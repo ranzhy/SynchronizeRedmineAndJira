@@ -1,6 +1,7 @@
 package com.thundersoft.jiraredmine.sync;
 
 import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -15,6 +16,7 @@ import com.taskadapter.redmineapi.bean.IssuePriority;
 import com.taskadapter.redmineapi.bean.IssueStatus;
 import com.taskadapter.redmineapi.bean.Project;
 import com.taskadapter.redmineapi.bean.Tracker;
+import com.taskadapter.redmineapi.internal.RedmineDateParser;
 import com.thundersoft.jiraredmine.accounts.AccountsManager;
 import com.thundersoft.jiraredmine.accounts.LocalGroup;
 import com.thundersoft.jiraredmine.accounts.LocalUser;
@@ -71,9 +73,12 @@ public class DefaultIssueHandler extends AbstractIssueHandler {
         issue.setAssigneeId(leader.getRedmineUserId());
         issue.setAssigneeName(leader.getUserName());
 
+        final SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss Z");
         if (!(addCustomField(issue, "JIRA-BUG", jira.getKey())
                 && addCustomField(issue, "JiraUrl", jira.getBrowseUrl())
-                && addCustomField(issue, "Group", group.getGroupName()))) {
+                && addCustomField(issue, "Group", group.getGroupName()))
+//                && addCustomField(issue, "Updated_JIRA", formatter.format(jira.getUpdatedTime()))
+                && addCustomField(issue, "Component_JIRA", jira.getComponent())) {
             Log.error(getClass(), "Creating redmine issue failed: " + issue + " for " + jira);
             return null;
         }
@@ -113,8 +118,10 @@ public class DefaultIssueHandler extends AbstractIssueHandler {
         boolean ret = false;
         ret |= syncSubject(redmine, jira);
         ret |= syncStatus(redmine, jira);
-        ret |= syncAssignerAndGroup(redmine, jira);
+//        ret |= syncAssignerAndGroup(redmine, jira);
         ret |= syncPriority(redmine, jira);
+        ret |= syncComponent(redmine, jira);
+//        ret |= syncUpdatedTime(redmine, jira);
         // TODO more info
         return ret;
     }
@@ -221,6 +228,39 @@ public class DefaultIssueHandler extends AbstractIssueHandler {
             addComment(redmine, comment);
         }
         return !jPriority.equals(rPriority);
+    }
+
+    protected boolean syncComponent(Issue redmine, JiraIssue jira) {
+        CustomField component = redmine.getCustomFieldByName("Component_JIRA");
+        String redmine_component = component.getValue();
+        String jira_component = jira.getComponent();
+        if (jira_component != null && !jira_component.equals(redmine_component)) {
+            String comment = "Auto change Component_JIRA \"" + redmine_component
+                    + "\" --> \"" + jira_component + "\"";
+            component.setValue(jira_component);
+            addComment(redmine, comment);
+            return true;
+        }
+        return false;
+    }
+
+    protected boolean syncUpdatedTime(Issue redmine, JiraIssue jira) {
+        CustomField updated = redmine.getCustomFieldByName("Updated_JIRA");
+        String redmine_updated = updated.getValue();
+        Date jira_updated = jira.getUpdatedTime();
+
+        if (jira_updated != null) {
+            final SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss Z");
+            String jira_updated_time = formatter.format(jira_updated);
+            if (!jira_updated_time.equals(redmine_updated)) {
+                String comment = "Auto change Updated_JIRA \"" + redmine_updated
+                        + "\" --> \"" + jira_updated_time + "\"";
+                updated.setValue(jira_updated_time);
+                addComment(redmine, comment);
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

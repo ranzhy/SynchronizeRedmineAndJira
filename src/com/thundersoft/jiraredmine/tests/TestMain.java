@@ -8,6 +8,12 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -56,6 +62,24 @@ public class TestMain {
 //            Issue issue = issues.next();
 //            System.out.println("" + issue);
 //        }
+
+//        String jira_date = "2018-05-22T17:03:28.000+0900";
+        String jira_date = "2018-05-22T17:03+0900";
+        jira_date = jira_date.replace("T", " ");
+//        jira_date = jira_date.replace("+0900", "");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mmz");
+        Date date = null;
+        try {
+            date = formatter.parse(jira_date);
+        } catch (ParseException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+//        LocalDateTime ldate = LocalDateTime.parse(jira_date);
+//        Date date = new Date(Date.parse(jira_date));
+        formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss Z");
+        System.out.println(formatter.format(date));
+
         System.setProperty ("jsse.enableSNIExtension", "false");
         RedmineManager manager = RedmineManagerFactory.createWithUserAuth(
                 "http://202.231.92.5:8100/redmine/", "ranzy0631", "ranzy0631@123");

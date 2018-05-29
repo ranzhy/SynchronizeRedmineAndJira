@@ -4,7 +4,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -87,6 +91,39 @@ public class JsonJiraIssueParser implements IJiraIssueParser {
     public String getReporter() {
         String reporter =  getValue(getChiledObject(mJsonFields, "reporter"), "name");
         return reporter == null ? "" : reporter;
+    }
+
+    @Override
+    public String getComponent() {
+        try {
+            JSONArray array = mJsonFields.getJSONArray("components");
+            String components = "";
+            for (int i = 0; i < array.length(); i++) {
+                JSONObject item = array.getJSONObject(i);
+                if (item != null) {
+                    String component = getValue(item, "name");
+                    components += "," + component;
+                }
+            }
+            return components.substring(1);
+        } catch (JSONException e) {
+            Log.error(getClass(),"[JsonJiraIssueParser]getComponent ", e);
+        }
+        return null;
+    }
+
+    @Override
+    public Date getUpdatedTime() {
+        String updated = getValue(mJsonFields, "updated");
+        updated = updated.replace("T", " ");
+
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSz");
+        try {
+            return formatter.parse(updated);
+        } catch (ParseException e) {
+            Log.error(getClass(),"[JsonJiraIssueParser]getUpdatedTime ", e);
+        }
+        return null;
     }
 
 }

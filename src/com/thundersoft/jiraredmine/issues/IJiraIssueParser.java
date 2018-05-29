@@ -1,6 +1,7 @@
 package com.thundersoft.jiraredmine.issues;
 
 import java.io.InputStream;
+import java.util.Date;
 
 public interface IJiraIssueParser {
 
@@ -19,4 +20,8 @@ public interface IJiraIssueParser {
     public String getPriority();
 
     public String getReporter();
+
+    public String getComponent();
+
+    public Date getUpdatedTime();
 }

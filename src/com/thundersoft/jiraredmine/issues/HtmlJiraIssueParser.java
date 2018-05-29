@@ -2,6 +2,9 @@ package com.thundersoft.jiraredmine.issues;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.cyberneko.html.parsers.DOMParser;
 import org.w3c.dom.Document;
@@ -95,6 +98,47 @@ public class HtmlJiraIssueParser implements IJiraIssueParser {
             }
         }
         return "";
+    }
+
+    @Override
+    public String getComponent() {
+        Element reporter_val = doc.getElementById("components-field");
+        NodeList component = reporter_val.getChildNodes();
+        String components = "";
+        for (int i = 0; i < component.getLength(); i++) {
+            Node node = component.item(i);
+            if (node instanceof Element) {
+                Element e = (Element) node;
+                if ("a".equals(e.getNodeName())) {
+                    components += ", " + e.getTextContent().trim();
+                }
+            }
+        }
+        return components.substring(1);
+    }
+
+    @Override
+    public Date getUpdatedTime() {
+        Element updated_date = doc.getElementById("updated-date");
+        NodeList date = updated_date.getChildNodes();
+        String time = "";
+        for (int i = 0; i < date.getLength(); i++) {
+            Node node = date.item(i);
+            if (node instanceof Element) {
+                Element datetime = (Element) node;
+                time = datetime.getAttribute("datetime");
+                if (time != null && !time.trim().isEmpty()) {
+                    time = time.trim().replace("T", " ");
+                    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mmz");
+                    try {
+                        return formatter.parse(time);
+                    } catch (ParseException e) {
+                        Log.error(getClass(),"[HtmlJiraIssueParser]getUpdatedTime ", e);
+                    }
+                }
+            }
+        }
+        return null;
     }
 
 }

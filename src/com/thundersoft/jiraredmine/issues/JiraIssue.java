@@ -9,6 +9,7 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Date;
 
 import org.cyberneko.html.parsers.DOMParser;
 import org.w3c.dom.Document;
@@ -117,6 +118,14 @@ public class JiraIssue {
         } catch (UnsupportedEncodingException e) {
         }
         return data;
+    }
+
+    public String getComponent() {
+        return mParser == null ? null : mParser.getComponent();
+    }
+
+    public Date getUpdatedTime() {
+        return mParser == null ? null : mParser.getUpdatedTime();
     }
 
     @Override
