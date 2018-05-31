@@ -24,4 +24,6 @@ public interface IJiraIssueParser {
     public String getComponent();
 
     public Date getUpdatedTime();
+
+    public String getDetectionPhase();
 }

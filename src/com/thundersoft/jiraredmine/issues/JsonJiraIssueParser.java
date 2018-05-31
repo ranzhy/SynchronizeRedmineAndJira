@@ -105,6 +105,9 @@ public class JsonJiraIssueParser implements IJiraIssueParser {
                     components += "," + component;
                 }
             }
+            if (components.isEmpty() && array.length() == 0) {
+                components = ",None"; 
+            }
             return components.substring(1);
         } catch (JSONException e) {
             Log.error(getClass(),"[JsonJiraIssueParser]getComponent ", e);
@@ -124,6 +127,12 @@ public class JsonJiraIssueParser implements IJiraIssueParser {
             Log.error(getClass(),"[JsonJiraIssueParser]getUpdatedTime ", e);
         }
         return null;
+    }
+
+    @Override
+    public String getDetectionPhase() {
+        String detectionPhase =  getValue(getChiledObject(mJsonFields, "customfield_10004"), "value");
+        return detectionPhase == null ? "" : detectionPhase;
     }
 
 }

@@ -78,7 +78,8 @@ public class DefaultIssueHandler extends AbstractIssueHandler {
                 && addCustomField(issue, "JiraUrl", jira.getBrowseUrl())
                 && addCustomField(issue, "Group", group.getGroupName()))
 //                && addCustomField(issue, "Updated_JIRA", formatter.format(jira.getUpdatedTime()))
-                && addCustomField(issue, "Component_JIRA", jira.getComponent())) {
+                && addCustomField(issue, "Component_JIRA", jira.getComponent())
+                && addCustomField(issue, "DetectionPhase", jira.getDetectionPhase())) {
             Log.error(getClass(), "Creating redmine issue failed: " + issue + " for " + jira);
             return null;
         }
@@ -122,6 +123,7 @@ public class DefaultIssueHandler extends AbstractIssueHandler {
         ret |= syncPriority(redmine, jira);
         ret |= syncComponent(redmine, jira);
 //        ret |= syncUpdatedTime(redmine, jira);
+        ret |= syncDetectionPhase(redmine, jira);
         // TODO more info
         return ret;
     }
@@ -261,6 +263,20 @@ public class DefaultIssueHandler extends AbstractIssueHandler {
             }
         }
         return false;
+    }
+
+    protected boolean syncDetectionPhase(Issue redmine, JiraIssue jira) {
+        CustomField detectionPhase = redmine.getCustomFieldByName("DetectionPhase");
+        String redmine_detectionPhase = detectionPhase.getValue();
+        String jira_detectionPhase = jira.getDetectionPhase();
+        boolean ret = !jira_detectionPhase.equals(redmine_detectionPhase);
+        if (ret) {
+            String comment = "Auto change detectionPhase \"" + redmine_detectionPhase
+                    + "\" --> \"" + jira_detectionPhase + "\"";
+            detectionPhase.setValue(jira_detectionPhase);
+            addComment(redmine, comment);
+        }
+        return ret;
     }
 
     @Override

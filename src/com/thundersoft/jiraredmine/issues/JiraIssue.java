@@ -128,6 +128,10 @@ public class JiraIssue {
         return mParser == null ? null : mParser.getUpdatedTime();
     }
 
+    public String getDetectionPhase() {
+        return mParser == null ? null : mParser.getDetectionPhase();
+    }
+
     @Override
     public String toString() {
         return "["+ (isValidIssue() ? "" : "(Invalid)") + getKey() + "(" + getAssigner() + "):" + getSubject() + "]";

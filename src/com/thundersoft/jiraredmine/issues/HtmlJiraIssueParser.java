@@ -105,7 +105,7 @@ public class HtmlJiraIssueParser implements IJiraIssueParser {
         Element reporter_val = doc.getElementById("components-field");
         NodeList component = reporter_val.getChildNodes();
         String components = "";
-        for (int i = 0; i < component.getLength(); i++) {
+        for (int i = 0; component != null && i < component.getLength(); i++) {
             Node node = component.item(i);
             if (node instanceof Element) {
                 Element e = (Element) node;
@@ -139,6 +139,14 @@ public class HtmlJiraIssueParser implements IJiraIssueParser {
             }
         }
         return null;
+    }
+
+    @Override
+    public String getDetectionPhase() {
+        Element detectionPhase_val = doc.getElementById("customfield_10004-val");
+        String detectionPhase = detectionPhase_val.getTextContent();
+        detectionPhase = (detectionPhase != null ? detectionPhase.trim() : "");
+        return detectionPhase;
     }
 
 }
