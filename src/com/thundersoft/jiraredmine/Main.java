@@ -24,7 +24,7 @@ public class Main {
             SystemConfig system = SystemConfig.getInstance();
             ServerConfig config = system.getServerConfig();
 
-            RedmineManager redmine = RedmineManagerFactory.createWithUserAuth(
+            final RedmineManager redmine = RedmineManagerFactory.createWithUserAuth(
                     config.getRedmineUrl(), config.getRedmineLoginUser(), config.getRedmineLoginPasswd());
 
             Log.info(Main.class, "Will create Issue handler for " + redmine);
@@ -40,12 +40,13 @@ public class Main {
             issugMgr.compareIssues(new IssueCompareCallback() {
 
                 @Override
-                public void onCompare(Issue redmine, JiraIssue jira, boolean clearRedmine) {
+                public void onCompare(Issue redmineIssue, JiraIssue jiraIssue, boolean clearRedmine) {
                     try {
-                        synchronizer.synchronize(redmine, jira, clearRedmine);
+                        redmineIssue = redmine.getIssueManager().getIssueById(redmineIssue.getId());
+                        synchronizer.synchronize(redmineIssue, jiraIssue, clearRedmine);
                     } catch (RedmineException e) {
                         Log.error(getClass(),
-                                "Synchronizing jira [" + jira + "] and redmine [" + redmine + "]", e);
+                                "Synchronizing jira [" + jiraIssue + "] and redmine [" + redmineIssue + "]", e);
                     }
                 }
 
