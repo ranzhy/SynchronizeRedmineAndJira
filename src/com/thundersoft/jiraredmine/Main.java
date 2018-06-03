@@ -42,7 +42,9 @@ public class Main {
                 @Override
                 public void onCompare(Issue redmineIssue, JiraIssue jiraIssue, boolean clearRedmine) {
                     try {
-                        redmineIssue = redmine.getIssueManager().getIssueById(redmineIssue.getId());
+                        if (redmineIssue != null) {
+                            redmineIssue = redmine.getIssueManager().getIssueById(redmineIssue.getId());
+                        }
                         synchronizer.synchronize(redmineIssue, jiraIssue, clearRedmine);
                     } catch (RedmineException e) {
                         Log.error(getClass(),

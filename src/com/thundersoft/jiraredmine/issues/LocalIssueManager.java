@@ -108,7 +108,7 @@ public class LocalIssueManager {
         }
     }
 
-    public void compareIssues(IssueCompareCallback callback) {
+    public void compareIssues(final IssueCompareCallback callback) {
         Set<String> keies = new HashSet<String>(mJireKeys);
         keies.addAll(mRedmineIssues.keySet());
         for (String bugKey : keies) {
