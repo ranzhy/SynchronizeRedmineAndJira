@@ -69,9 +69,11 @@ public class DefaultIssueHandler extends AbstractIssueHandler {
             return null;
         }
         LocalGroup group = user.getGroup();
-        LocalUser leader = group.getLeader();
-        issue.setAssigneeId(leader.getRedmineUserId());
-        issue.setAssigneeName(leader.getUserName());
+//        LocalUser leader = group.getLeader();
+//        issue.setAssigneeId(leader.getRedmineUserId());
+//        issue.setAssigneeName(leader.getUserName());
+        issue.setAssigneeId(user.getRedmineUserId());
+        issue.setAssigneeName(user.getUserName());
 
         final SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss Z");
         if (!(addCustomField(issue, "JIRA-BUG", jira.getKey())
