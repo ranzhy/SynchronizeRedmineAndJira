@@ -75,11 +75,11 @@ public class DefaultIssueHandler extends AbstractIssueHandler {
         issue.setAssigneeId(user.getRedmineUserId());
         issue.setAssigneeName(user.getUserName());
 
-        final SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss Z");
+        final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         if (!(addCustomField(issue, "JIRA-BUG", jira.getKey())
                 && addCustomField(issue, "JiraUrl", jira.getBrowseUrl())
                 && addCustomField(issue, "Group", group.getGroupName()))
-//                && addCustomField(issue, "Updated_JIRA", formatter.format(jira.getUpdatedTime()))
+                && addCustomField(issue, "Updated_JIRA", formatter.format(jira.getUpdatedTime()))
                 && addCustomField(issue, "Component_JIRA", jira.getComponent())
                 && addCustomField(issue, "DetectionPhase", jira.getDetectionPhase())) {
             Log.error(getClass(), "Creating redmine issue failed: " + issue + " for " + jira);
@@ -124,7 +124,7 @@ public class DefaultIssueHandler extends AbstractIssueHandler {
 //        ret |= syncAssignerAndGroup(redmine, jira);
         ret |= syncPriority(redmine, jira);
         ret |= syncComponent(redmine, jira);
-//        ret |= syncUpdatedTime(redmine, jira);
+        ret |= syncUpdatedTime(redmine, jira);
         ret |= syncDetectionPhase(redmine, jira);
         // TODO more info
         return ret;
@@ -254,7 +254,7 @@ public class DefaultIssueHandler extends AbstractIssueHandler {
         Date jira_updated = jira.getUpdatedTime();
 
         if (jira_updated != null) {
-            final SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss Z");
+            final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
             String jira_updated_time = formatter.format(jira_updated);
             if (!jira_updated_time.equals(redmine_updated)) {
                 String comment = "Auto change Updated_JIRA \"" + redmine_updated

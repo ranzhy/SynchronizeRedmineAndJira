@@ -48,7 +48,7 @@ import org.xml.sax.SAXException;
 
 public class TestMain {
 
-    public static void main(String[] args) throws URISyntaxException, InterruptedException, ExecutionException, RedmineException, SAXException, IOException {
+    public static void main(String[] args) throws URISyntaxException, InterruptedException, ExecutionException, SAXException, IOException, RedmineException {
 //        URI url = new URI("https://spdojira.eww.panasonic.com");
 //        JiraRestClientFactory facotry = new AsynchronousJiraRestClientFactory();
 //        JiraRestClient client = facotry.createWithBasicHttpAuthentication(url, "ranzy0631.ts", "Apr4444444");
@@ -64,59 +64,77 @@ public class TestMain {
 //        }
 
 //        String jira_date = "2018-05-22T17:03:28.000+0900";
-        String jira_date = "2018-05-22T17:03+0900";
-        jira_date = jira_date.replace("T", " ");
-//        jira_date = jira_date.replace("+0900", "");
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mmz");
-        Date date = null;
-        try {
-            date = formatter.parse(jira_date);
-        } catch (ParseException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-//        LocalDateTime ldate = LocalDateTime.parse(jira_date);
-//        Date date = new Date(Date.parse(jira_date));
-        formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss Z");
-        System.out.println(formatter.format(date));
-
-        System.setProperty ("jsse.enableSNIExtension", "false");
+//        String jira_date = "2018-05-22T17:03+0900";
+//        jira_date = jira_date.replace("T", " ");
+////        jira_date = jira_date.replace("+0900", "");
+//        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mmz");
+//        Date date = null;
+//        try {
+//            date = formatter.parse(jira_date);
+//        } catch (ParseException e) {
+//            // TODO Auto-generated catch block
+//            e.printStackTrace();
+//        }
+////        LocalDateTime ldate = LocalDateTime.parse(jira_date);
+////        Date date = new Date(Date.parse(jira_date));
+//        formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss Z");
+//        System.out.println(formatter.format(date));
+//
+//        System.setProperty ("jsse.enableSNIExtension", "false");
         RedmineManager manager = RedmineManagerFactory.createWithUserAuth(
                 "http://202.231.92.5:8100/redmine/", "ranzy0631", "ranzy0631@123");
-//        ProjectManager pgm = manager.getProjectManager();
-//        List<Project> projects = pgm.getProjects();
-//        for (Project project : projects) {
-//            System.out.println(project + "");
-//        }
-        Project project = manager.getProjectManager().getProjectByKey("vienna_us_jirabug");
+////        ProjectManager pgm = manager.getProjectManager();
+////        List<Project> projects = pgm.getProjects();
+////        for (Project project : projects) {
+////            System.out.println(project + "");
+////        }
+//        Project project = manager.getProjectManager().getProjectByKey("vienna_us_jirabug");
         IssueManager issueManager = manager.getIssueManager();
-        List<IssueStatus> statuses = issueManager.getStatuses();
-        IssueStatus rejected = null;
-        IssueStatus closed = null;
-        for (IssueStatus status : statuses) {
-            System.out.println(status.getName() + " : " + status);
-            if ("Rejected".equals(status.getName())) {
-                rejected = status;
-            } else if ("Closed".equals(status.getName())) {
-                closed = status;
-            }
-        }
-        HashMap<String, String> parameters = new HashMap<String, String>();
-        parameters.put("project_id", "vienna_us_jirabug");
-        parameters.put("status_id", "" + closed.getId());
-//        List<Issue> issues = issueManager.getIssues(project.getName(), null);
-        ResultsWrapper<Issue> isues = issueManager.getIssues(parameters);
-        for (Issue issue : /*issues*/ isues.getResults()) {
-//            System.out.println(issue + " : " + issue.getCustomFieldByName("JiraUrl"));
-//            if (checkJiraAndRedmine(issue)) {
-//                issueManager.update(issue);
+//        List<IssueStatus> statuses = issueManager.getStatuses();
+//        IssueStatus rejected = null;
+//        IssueStatus closed = null;
+//        for (IssueStatus status : statuses) {
+//            System.out.println(status.getName() + " : " + status);
+//            if ("Rejected".equals(status.getName())) {
+//                rejected = status;
+//            } else if ("Closed".equals(status.getName())) {
+//                closed = status;
 //            }
-            if ("Rejected".equals(issue.getStatusName())) {
-                System.err.println(issue.getStatusName() + " : " + issue);
-            } else {
-                System.out.println(issue.getStatusName() + " : " + issue);
-            }
+//        }
+//        HashMap<String, String> parameters = new HashMap<String, String>();
+//        parameters.put("project_id", "vienna_us_jirabug");
+//        parameters.put("status_id", "" + closed.getId());
+////        List<Issue> issues = issueManager.getIssues(project.getName(), null);
+//        ResultsWrapper<Issue> isues = issueManager.getIssues(parameters);
+//        for (Issue issue : /*issues*/ isues.getResults()) {
+////            System.out.println(issue + " : " + issue.getCustomFieldByName("JiraUrl"));
+////            if (checkJiraAndRedmine(issue)) {
+////                issueManager.update(issue);
+////            }
+//            if ("Rejected".equals(issue.getStatusName())) {
+//                System.err.println(issue.getStatusName() + " : " + issue);
+//            } else {
+//                System.out.println(issue.getStatusName() + " : " + issue);
+//            }
+//        }
+        Issue issue;
+        try {
+            issue = issueManager.getIssueById(6268);
+            CustomField field = issue.getCustomFieldByName("Updated_JIRA");
+
+//            final SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss Z");
+            final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+            Date date = new Date(System.currentTimeMillis());
+            String value = formatter.format(date);
+
+            field.setValue(value);
+
+            System.out.println("field : " + field);
+            issueManager.update(issue);
+        } catch (RedmineException e) {
+            e.printStackTrace();
         }
+
     }
 
     private static boolean checkJiraAndRedmine(Issue issue) throws IOException, SAXException {
