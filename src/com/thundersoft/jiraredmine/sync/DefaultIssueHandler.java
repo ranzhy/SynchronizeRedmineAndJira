@@ -16,6 +16,7 @@ import com.taskadapter.redmineapi.bean.IssuePriority;
 import com.taskadapter.redmineapi.bean.IssueStatus;
 import com.taskadapter.redmineapi.bean.Project;
 import com.taskadapter.redmineapi.bean.Tracker;
+import com.taskadapter.redmineapi.bean.Version;
 import com.taskadapter.redmineapi.internal.RedmineDateParser;
 import com.thundersoft.jiraredmine.accounts.AccountsManager;
 import com.thundersoft.jiraredmine.accounts.LocalGroup;
@@ -75,13 +76,16 @@ public class DefaultIssueHandler extends AbstractIssueHandler {
         issue.setAssigneeId(user.getRedmineUserId());
         issue.setAssigneeName(user.getUserName());
 
+        Version version = getVersionByName(jira.getDetectionPhase());
+        if (version != null) {
+            issue.setTargetVersion(version);
+        }
         final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         if (!(addCustomField(issue, "JIRA-BUG", jira.getKey())
                 && addCustomField(issue, "JiraUrl", jira.getBrowseUrl())
                 && addCustomField(issue, "Group", group.getGroupName()))
-                && addCustomField(issue, "Updated_JIRA", formatter.format(jira.getUpdatedTime()))
                 && addCustomField(issue, "Component_JIRA", jira.getComponent())
-                && addCustomField(issue, "DetectionPhase", jira.getDetectionPhase())) {
+                && addCustomField(issue, "Updated_JIRA", formatter.format(jira.getUpdatedTime()))) {
             Log.error(getClass(), "Creating redmine issue failed: " + issue + " for " + jira);
             return null;
         }
@@ -125,7 +129,7 @@ public class DefaultIssueHandler extends AbstractIssueHandler {
         ret |= syncPriority(redmine, jira);
         ret |= syncComponent(redmine, jira);
         ret |= syncUpdatedTime(redmine, jira);
-        ret |= syncDetectionPhase(redmine, jira);
+        ret |= syncTargetVersion(redmine, jira);
         // TODO more info
         return ret;
     }
@@ -267,15 +271,15 @@ public class DefaultIssueHandler extends AbstractIssueHandler {
         return false;
     }
 
-    protected boolean syncDetectionPhase(Issue redmine, JiraIssue jira) {
-        CustomField detectionPhase = redmine.getCustomFieldByName("DetectionPhase");
-        String redmine_detectionPhase = detectionPhase.getValue();
+    protected boolean syncTargetVersion(Issue redmine, JiraIssue jira) {
+        Version version = redmine.getTargetVersion();
         String jira_detectionPhase = jira.getDetectionPhase();
-        boolean ret = !jira_detectionPhase.equals(redmine_detectionPhase);
+        Version target = getVersionByName(jira_detectionPhase);
+        boolean ret = (target != null && !target.equals(version));
         if (ret) {
-            String comment = "Auto change detectionPhase \"" + redmine_detectionPhase
-                    + "\" --> \"" + jira_detectionPhase + "\"";
-            detectionPhase.setValue(jira_detectionPhase);
+            String comment = "Auto change Target version \"" + version
+                    + "\" --> \"" + target + "\"";
+            redmine.setTargetVersion(target);
             addComment(redmine, comment);
         }
         return ret;

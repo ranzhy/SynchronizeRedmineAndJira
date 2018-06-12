@@ -36,6 +36,7 @@ import com.taskadapter.redmineapi.bean.CustomField;
 import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.bean.IssueStatus;
 import com.taskadapter.redmineapi.bean.Project;
+import com.taskadapter.redmineapi.bean.Version;
 import com.taskadapter.redmineapi.internal.ResultsWrapper;
 
 import org.cyberneko.html.parsers.DOMParser;
@@ -119,18 +120,22 @@ public class TestMain {
 //        }
         Issue issue;
         try {
-            issue = issueManager.getIssueById(6268);
-            CustomField field = issue.getCustomFieldByName("Updated_JIRA");
-
-//            final SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss Z");
-            final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-            Date date = new Date(System.currentTimeMillis());
-            String value = formatter.format(date);
-
-            field.setValue(value);
-
-            System.out.println("field : " + field);
-            issueManager.update(issue);
+            issue = issueManager.getIssueById(6274);
+//            CustomField field = issue.getCustomFieldByName("Updated_JIRA");
+//
+////            final SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss Z");
+//            final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+//            Date date = new Date(System.currentTimeMillis());
+//            String value = formatter.format(date);
+//
+//            field.setValue(value);
+//
+//            System.out.println("field : " + field);
+//            issueManager.update(issue);
+            List<Version> versions = manager.getProjectManager().getVersions(issue.getProjectId());
+            Version version = issue.getTargetVersion();
+            System.out.println("versions : " + versions);
+            System.out.println("version : " + version);
         } catch (RedmineException e) {
             e.printStackTrace();
         }
